@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal Portfolio</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #00ff00;
+      font-family: monospace;
+      padding: 20px;
+      white-space: pre-wrap;
+    }
+    #boot, #menu, #terminal {
+      display: none;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      background: #00ff00;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+    #commandInput {
+      background: transparent;
+      border: none;
+      color: #00ff00;
+      font-family: monospace;
+      width: auto;
+      outline: none;
+      display: inline;
+    }
+    .link {
+      color: #00ff00;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="boot"></div>
+  <div id="menu">
+    guest@Delivlinux in ~ $ ls -l
+    drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('about')">about</span><br>
+    drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('blog')">blog</span>
+  </div>
+  <div id="terminal">
+    <span id="prompt">guest@Delivlinux in ~ $</span><input type="text" id="commandInput" autocomplete="off"><span id="suggestion" style="font-style: italic; color: #00ff00;"></span>
+  </div>
+
+  <script>
+    const bootLines = [
+      'Starting Arch Linux...',
+      '[ OK ] Mounted /boot',
+      '[ OK ] Started Network Manager',
+      '[ OK ] Reached target Graphical Interface',
+      '',
+      '                  -`                     Alexandre@Archlinux',
+      '                 .o+`                    -------------',
+      '                `ooo/                    OS: Arch Linux (x86_64)',
+      '               `+oooo:                   Kernel: Linux 6.13.8-zen1-1-zen',
+      '              `+oooooo:                  Uptime: 35 years',
+      '            `/:-:++oooo+:                Shell: Delivrabilishell',
+      '           `/++++/+++++++:               Terminal: Positive Group',
+      '          `/++++++++++++++:              Memory: 13.21 GiB / 3 TiB',
+      '         `/+++ooooooooooooo/`',
+      '        ./ooosssso++osssssso+`',
+      '       .oossssso-````/ossssss+`',
+      '      -osssssso.      :ssssssso.',
+      '     :osssssss/        osssso+++.',
+      '    /ossssssss/        +ssssooo/-',
+      '  `/ossssso+/:-        -:/+osssso+-',
+      ' `+sso+:-`                 `.-/+oso:',
+      '`++:.                           `-/+/',
+      '.`                                 `/','',
+      'Boot complete.',
+      '',
+      'Commandes disponibles:',
+      '  cd [dossier]    - entrer dans un dossier',
+      '  cd ..           - revenir au dossier précédent',
+      '  ls -l           - lister les fichiers',
+      '  cat [fichier]   - afficher un fichier',
+      '  clear           - effacer le terminal',
+      '  help            - affiche une aide',
+      '  whoami          - afficher le nom de l’utilisateur',
+      '  neofetch        - afficher les infos système'
+    ];
+
+    let currentLine = 0;
+    let currentDir = '~';
+    const bootDiv = document.getElementById('boot');
+    const menuDiv = document.getElementById('menu');
+    const terminalDiv = document.getElementById('terminal');
+    const input = document.getElementById('commandInput');
+    const prompt = document.getElementById('prompt');
+
+    function updatePrompt() {
+      prompt.textContent = `guest@Delivlinux in ${currentDir} $`;
+    }
+
+    function showNextLine() {
+      if (currentLine < bootLines.length) {
+        bootDiv.innerHTML += bootLines[currentLine++] + '\n';
+        setTimeout(showNextLine, 100);
+      } else {
+        setTimeout(() => {
+          bootDiv.style.display = 'block';
+          menuDiv.style.display = 'block';
+          terminalDiv.style.display = 'block';
+          input.focus();
+        }, 1000);
+      }
+    }
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const value = input.value.trim();
+        const tokens = value.split(' ');
+        const suggestionSpan = document.getElementById('suggestion');
+        suggestionSpan.textContent = '';
+
+        if ((tokens[0] === 'cat' || tokens[0] === 'cd') && tokens[1]) {
+          const partial = tokens[1];
+          let suggestions = [];
+
+          if (tokens[0] === 'cat' && currentDir === 'about') {
+            suggestions = ['presentation.txt', 'cv.pdf'].filter(f => f.startsWith(partial));
+          } else if (tokens[0] === 'cd') {
+            suggestions = ['about', 'blog'].filter(d => d.startsWith(partial));
+          }
+
+          if (suggestions.length === 1) {
+            input.value = tokens[0] + ' ' + suggestions[0];
+          } else if (suggestions.length > 1) {
+            bootDiv.innerHTML += 'Suggestions : ' + suggestions.join('  ') + '\n';
+            suggestionSpan.textContent = suggestions[0].substring(partial.length);
+          }
+        }
+
+        window.scrollTo(0, document.body.scrollHeight);
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        const command = input.value.trim();
+        input.value = '';
+        bootDiv.innerHTML += `\n${prompt.textContent} ${command}\n`;
+        menuDiv.style.display = 'none';
+
+        if (command === 'clear') {
+          bootDiv.innerHTML = '';
+          if (currentDir === '~') menuDiv.style.display = 'block';
+          else menuDiv.style.display = 'none';
+        } else if (command === 'help') {
+          bootDiv.innerHTML += 'are you blacklisted on spamhaus?\n';
+        } else if (command === 'whoami') {
+          bootDiv.innerHTML += 'You only knows...\n';
+        } else if (command === 'neofetch') {
+          bootDiv.innerHTML += bootLines.slice(5, 25).join('\n') + '\n';
+        } else if (command === 'ls -l') {
+          if (currentDir === '~') {
+            bootDiv.innerHTML += `drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('about')">about</span>\n`;
+            bootDiv.innerHTML += `drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('blog')">blog</span>\n`;
+          } else if (currentDir === 'about') {
+            bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/presentation.txt')">presentation.txt</span>\n`;
+            bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/cv.pdf')">cv.pdf</span>\n`;
+          }
+        } else if (command.startsWith('cd')) {
+          const target = command.split(' ')[1];
+          if (target === '..') {
+            currentDir = '~';
+            updatePrompt();
+            menuDiv.style.display = 'block';
+            input.value = 'ls -l';
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+          } else if (target === 'about' || target === 'blog') {
+            currentDir = target;
+            updatePrompt();
+            menuDiv.style.display = 'none';
+            input.value = 'ls -l';
+            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+          } else {
+            bootDiv.innerHTML += `cd: ${target}: Aucun dossier de ce nom\n`;
+          }
+        } else if (command.startsWith('cat')) {
+          const file = command.split(' ')[1];
+          if (file === 'presentation.txt' && currentDir === 'about') {
+            bootDiv.innerHTML += `Bonjour ! \n\nJe suis responsable délivrabilité au Groupe Positive où je m'assure que les messages de nos clients atteignent leur public cible de manière efficace et sécurisée. Mon expertise couvre :\n\n- Délivrabilité des Emails : Analyse et résolution des problèmes de softbounce et hardbounce, optimisation des taux de livraison.\n- Gestion de Projets : Coordination des initiatives marketing avec une approche centrée sur les résultats.\n\nSinon comme vous pouvez le constater, je suis un geek qui aime les projets farfelus, comme ce site ! :D\n`;
+          } else if (file === 'cv.pdf' && currentDir === 'about') {
+            window.open('https://www.linkedin.com/in/alexandre-baverel-schmit/', '_blank');
+          } else {
+            bootDiv.innerHTML += `cat: ${file}: Fichier introuvable\n`;
+          }
+        } else {
+          bootDiv.innerHTML += `Commande non reconnue : ${command}\n`;
+        }
+        window.scrollTo(0, document.body.scrollHeight);
+      }
+    });
+
+    // Start boot animation
+    bootDiv.style.display = 'block';
+    showNextLine();
+  </script>
+</body>
+</html>
