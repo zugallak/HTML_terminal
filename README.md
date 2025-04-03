@@ -41,9 +41,3 @@
 ### 2. **Affichage du contenu des articles**
 - Lors de l'exécution de la commande **`cat [slug_article]`**, le contenu du fichier JSON sera extrait et affiché dans le terminal.
 - La bannière de l'article sera simulée par un texte ou une miniature, et le contenu sera formaté avec du Markdown simple (titres, bullet points, liens, etc.).
-
-## Installation
-
-1. Clonez ce projet dans votre répertoire local :
-   ```bash
-   git clone https://github.com/username/terminal-portfolio.git
