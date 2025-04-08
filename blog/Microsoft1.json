@@ -1,0 +1,12 @@
+{
+    "slug": "Microsoft1",
+    "title": "Microsoft durcit ses règles d'emailing",
+    "banner": "https://media.licdn.com/dms/image/v2/D4E12AQGVOAvAxdOP-A/article-cover_image-shrink_720_1280/B4EZX8EEdGHgAI-/0/1743690681116",  // URL de la bannière
+    "content": [
+      {
+        "type": "markdown",
+        "text": "# Microsoft durcit ses règles d'emailing : êtes-vous prêt ? 🚀**\n\nVous envoyez plus de 5000 emails par jour vers Outlook.com ? Alors, préparez-vous ! À partir du 5 mai 2025, Microsoft monte d'un cran ses exigences d'authentification, rejoignant ainsi Google et Yahoo dans leur combat contre le spam et les emails frauduleux.\n\n## Ce que Microsoft attend de vous dès 2025 🎯\n\n* **SPF (Sender Policy Framework)** : Vous devrez clairement indiquer dans vos DNS qui a le droit d'envoyer des emails au nom de votre domaine. Fini les approximations !\n* **DKIM (DomainKeys Identified Mail)** : Chaque email devra porter une signature numérique DKIM pour prouver son authenticité. Oui, chaque email, pas de passe-droit !\n* **DMARC (Domain-based Message Authentication, Reporting & Conformance)** : Configurez une politique DMARC au minimum en `p=none` et alignez-la sur SPF ou DKIM (même si idéalement, on vous recommande les deux !).\n\n## Et si vous ne jouez pas le jeu ? 😱\n\nPas de panique… enfin, si, un peu quand même :\n\n* Vos emails risquent de finir directement dans la case « Courrier indésirable ».\n* Si vous continuez à ignorer ces règles, Microsoft pourra purement et simplement rejeter vos emails. Ouch !\n\n## Pourquoi Microsoft fait-il ça ? 🤔\n\nPas pour vous embêter, promis ! Le but, c'est d'améliorer la sécurité des utilisateurs, de réduire les spams et le phishing, et de restaurer la confiance dans les boîtes de réception.\n\n## Les bonnes pratiques pour rester zen et conforme 😎\n\n* **DNS parfaits tu auras** : Assurez-vous que SPF, DKIM et DMARC soient impeccables.\n* **Ta réputation tu surveilleras** : Utilisez Microsoft SNDS, Google Postmaster, ou d'autres outils efficaces pour garder un œil sur votre réputation.\n* **Désinscription facile tu proposeras** : Simplifiez la vie de vos destinataires avec une désinscription en un clic pour éviter les plaintes.\n\nEn anticipant ces changements, vous protégerez non seulement votre réputation, mais vous boosterez aussi votre délivrabilité. Et ça, c’est toujours bon à prendre ! ✨"
+      }
+    ]
+  }
+  
