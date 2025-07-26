@@ -128,6 +128,7 @@
       '  neofetch          - display system information',
       '  exit              - close the terminal',
       '  curl              - navigate to targeted URL',
+      '  licence           - Show licence and Git info',
       '  Misc commands : cowsay [message], fortune, weather [city], ip a',
       '  Press tab key to autocomplete !'
     ];
@@ -220,6 +221,7 @@
   bootDiv.innerHTML += '  neofetch          - display system information\n';
   bootDiv.innerHTML += '  exit              - close the terminal\n';
   bootDiv.innerHTML += '  curl              - navigate to target URL\n';
+  bootDiv.innerHTML += '  licence           - Show licence and Git info\n';
   bootDiv.innerHTML += '  Misc commands : cowsay [message], fortune, weather [city], ip a\n';
   bootDiv.innerHTML += '  Press tab key to autocomplete !\n';
 } else if (command === 'whoami') {
@@ -259,6 +261,12 @@
       bootDiv.innerHTML += `No blog articles found.\n`;
     }
   }
+}
+else if (command === 'licence') {
+  bootDiv.innerHTML += 'Terminal Portfolio is licensed under CC BY-NC-ND 4.0\n';
+  bootDiv.innerHTML += 'Source code available at: https://github.com/zugallak/monsite\n';
+  bootDiv.innerHTML += 'This means you can share this work with proper attribution,\n';
+  bootDiv.innerHTML += 'but cannot use it commercially or create derivative works.\n';
 }
 // Handle the weather command
 else if (command.startsWith('weather')) {
@@ -345,6 +353,12 @@ else if (command === 'ip a') {
     .catch(err => {
       bootDiv.innerHTML += `Error fetching IP address: ${err.message}\n`;
     });
+}
+ else if (command === 'license') {
+  bootDiv.innerHTML += 'Terminal Portfolio is licensed under CC BY-NC-ND 4.0\n';
+  bootDiv.innerHTML += 'Source code available at: https://github.com/zugallak/monsite\n';
+  bootDiv.innerHTML += 'This means you can share this work with proper attribution,\n';
+  bootDiv.innerHTML += 'but cannot use it commercially or create derivative works.\n';
 }
 else if (command === 'fortune') {
   const fortunes = [
