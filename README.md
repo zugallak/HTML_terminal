@@ -1,43 +1,95 @@
 # Terminal Portfolio
 
-**Terminal Portfolio** est un site web interactif simulant une interface de terminal, conçu pour présenter un portfolio de manière ludique. Ce projet utilise uniquement du **HTML**, **CSS** et **JavaScript** pour offrir une expérience utilisateur immersive.
+**Terminal Portfolio** is an interactive website simulating a terminal interface, designed to present a portfolio in a fun way. This project uses only **HTML**, **CSS**, and **JavaScript** to provide an immersive user experience.
 
-## Fonctionnalités Actuelles (V1)
+## Current Features (V1)
 
-### 1. **Boot Animation**
-- Animation de démarrage façon Arch Linux avec des lignes de log simulées (ex. : "Mounted /boot", "Network Manager started").
-- L'écran de démarrage présente une expérience fluide avant d'atteindre l'interface du terminal.
+### 1. Boot Animation
 
-### 2. **Navigation Terminal**
-- Un **terminal interactif** où l'utilisateur peut entrer des commandes.
-- Le prompt est affiché sous la forme `guest@Delivlinux in [dossier] $`.
-- Commandes principales supportées :
-  - **`cd [dossier]`** : Naviguer dans les dossiers (par exemple `about` et `blog`).
-  - **`ls -l`** : Lister les fichiers du répertoire courant.
-  - **`cat [fichier]`** : Afficher le contenu d'un fichier texte, comme la présentation de l'utilisateur.
-  - **`clear`** : Effacer le terminal pour repartir à zéro.
-  - **`help`** : Affiche un message d'aide "Are you blacklisted on Spamhaus?"
-  - **`whoami`** : Affiche "You only knows..."
-  - **`neofetch`** : Affiche les infos système simulées (similaire à la commande `neofetch`).
-  
-### 3. **Auto-complétion**
-- Utilisation de la touche **`Tab`** pour auto-compléter les commandes disponibles, avec une suggestion affichée en **italique**.
+- Arch Linux-style boot animation with simulated log lines
+- Displays system information similar to neofetch
+- Lists available commands after boot
 
-### 4. **Affichage Dynamique**
-- La sortie de chaque commande est simulée en temps réel via la modification du DOM avec JavaScript.
-- Affichage des fichiers en **`ls -l`** et liens cliquables pour accéder aux fichiers ou aux dossiers.
+### 2. Terminal Navigation
 
-### 5. **Affichage du CV et de la Présentation**
-- La commande **`cat presentation.txt`** affiche la présentation textuelle de l'utilisateur.
-- La commande **`cat cv.pdf`** ouvre un lien vers le **CV LinkedIn** dans un nouvel onglet.
+- Interactive terminal with command history
+- Prompt displayed as `guest@Delivlinux in [directory] $`
+- Supported commands:
+  - `cd [directory]`: Navigate directories
+  - `cd ..`: Go back to previous directory
+  - `ls -l` or `ls`: List files in current directory
+  - `cat [file]`: Display file contents
+  - `clear`: Clear the terminal
+  - `help`: Display available commands
+  - `whoami`: Display username
+  - `neofetch`: Display system information
+  - `exit`: Close the terminal and redirect to Google
+  - `curl [URL]`: Navigate to target URL
+  - `cowsay [message]`: Display message in cow ASCII art
+  - `fortune`: Display a random fortune
+  - `weather [city]`: Get weather information
+  - `ip a`: Show public IP address
+  - `last`: Load the most recent blog article
+  - `clearcache`: Clear local and session storage
 
-## Fonctionnalités à venir (V2)
+### 3. Autocompletion
 
-### 1. **Ajout d'articles de blog depuis une variable JSON locale**
-- Dans la V2, les articles de blog seront ajoutés via des fichiers JSON locaux.
-- Chaque article de blog contiendra des informations comme le titre, la date, une bannière d'image et le contenu en Markdown (avec des titres H1, H2, des listes à puces, etc.).
-- Ces articles seront accessibles via la commande **`cat [article_slug]`** (par exemple : `cat microsoft-durcit-emailing`).
-  
-### 2. **Affichage du contenu des articles**
-- Lors de l'exécution de la commande **`cat [slug_article]`**, le contenu du fichier JSON sera extrait et affiché dans le terminal.
-- La bannière de l'article sera simulée par un texte ou une miniature, et le contenu sera formaté avec du Markdown simple (titres, bullet points, liens, etc.).
+- Tab key for command and file/directory name autocompletion
+- Visual suggestions displayed when typing commands
+
+### 4. Dynamic Display
+
+- Real-time command output simulation
+- Clickable links for files and directories
+- Markdown content rendering for articles
+
+### 5. Content Display
+
+- `cat presentation.txt`: Shows text presentation
+- `cat cv.pdf`: Opens LinkedIn profile in new tab
+- Blog article display with banners and formatted content
+
+## Upcoming Features (V2)
+
+### 1. Blog Articles from Local JSON
+
+- Blog articles loaded from JSON files
+- Each article contains title, date, banner image, and Markdown content
+- Accessible via `cat [article_slug]` command
+
+### 2. Enhanced Content Display
+
+- Improved Markdown rendering with support for:
+  - Images
+  - Code blocks
+  - Inline code
+  - Bold and italic text
+  - Headers
+  - Lists
+  - Links
+  - Emojis
+
+## Installation
+
+1. Clone this repository
+2. Open `index.html` in your browser
+
+## Usage
+
+Simply enter commands in the terminal interface to navigate and explore the portfolio content. Use the `help` command to see all available commands.
+
+## Contributing
+
+This project is not currently accepting contributions or pull requests. If you have suggestions or find issues, please open an issue to discuss them.
+
+## License
+
+This work is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/). This means:
+
+- **You can share** - copy and redistribute the material in any medium or format
+- **Under the following terms**:
+  - **Attribution** - You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.
+  - **NonCommercial** - You may not use the material for commercial purposes.
+  - **NoDerivatives** - If you remix, transform, or build upon the material, you may not distribute the modified material.
+
+For more information, please see the full license text at [Creative Commons BY-NC-ND 4.0](https://creativecommons.org/licenses/by-nc-nd/4.0/).
