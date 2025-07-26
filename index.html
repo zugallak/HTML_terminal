@@ -4,42 +4,79 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terminal Portfolio</title>
-  <style>
-    body {
-      background-color: #111;
-      color: #00ff00;
-      font-family: monospace;
-      padding: 20px;
-      white-space: pre-wrap;
-    }
-    #boot, #menu, #terminal {
-      display: none;
-    }
-    .cursor {
-      display: inline-block;
-      width: 10px;
-      background: #00ff00;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-    #commandInput {
-      background: transparent;
-      border: none;
-      color: #00ff00;
-      font-family: monospace;
-      width: auto;
-      outline: none;
-      display: inline;
-    }
-    .link {
-      color: #00ff00;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-  </style>
+<style>
+  body {
+    background-color: #111;
+    color: #00E000;
+    font-family: monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 20px;
+    white-space: pre-wrap;
+  }
+
+  #boot, #menu, #terminal {
+    display: none;
+  }
+
+  .cursor {
+    display: inline-block;
+    width: 10px;
+    background: #00E000;
+    animation: blink 1s infinite;
+  }
+
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  #commandInput {
+    background: transparent;
+    border: none;
+    color: #00E000;
+    font-family: monospace;
+    font-size: inherit;
+    width: 50%;
+    outline: none;
+    display: inline;
+    margin-left: 10px;
+  }
+
+  .link {
+    color: #00E000;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .link:hover {
+    color: #FFFFFF;
+    text-shadow: 0 0 5px #00E000;
+  }
+
+  #suggestionsContainer {
+    position: absolute;
+    background: #111;
+    color: #00E000;
+    padding: 10px;
+    border: 1px solid #00E000;
+    border-radius: 5px;
+    z-index: 1000;
+    box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+    max-width: 50%;
+  }
+    pre code {
+    background-color: #222; /* Background color for code blocks */
+    color: #00E000; /* Text color for code blocks */
+    padding: 10px; /* Padding around code blocks */
+    border-radius: 5px; /* Rounded corners for code blocks */
+    overflow: auto; /* Auto-scroll for long code blocks */
+    white-space: pre; /* Preserve whitespace in code blocks */
+    display: block; /* Make code blocks block-level elements */
+    margin: 10px 0; /* Margin around code blocks */
+  }
+</style>
 </head>
 <body>
   <div id="boot"></div>
@@ -51,6 +88,7 @@
   <div id="terminal">
     <span id="prompt">guest@Delivlinux in ~ $</span><input type="text" id="commandInput" autocomplete="off"><span id="suggestion" style="font-style: italic; color: #00ff00;"></span>
   </div>
+  <div id="suggestionsContainer" style="display: none; position: absolute; background: #111; color: #00ff00; padding: 5px; border: 1px solid #00ff00; z-index: 1000;"></div>
 
   <script>
     const bootLines = [
@@ -79,15 +117,19 @@
       '.`                                 `/','',
       'Boot complete.',
       '',
-      'Commandes disponibles:',
-      '  cd [dossier]    - entrer dans un dossier',
-      '  cd ..           - revenir au dossier précédent',
-      '  ls -l           - lister les fichiers',
-      '  cat [fichier]   - afficher un fichier',
-      '  clear           - effacer le terminal',
-      '  help            - affiche une aide',
-      '  whoami          - afficher le nom de l’utilisateur',
-      '  neofetch        - afficher les infos système'
+      'Commands available :',
+      '  cd [directory]    - enter a directory',
+      '  cd ..             - go back to the previous directory',
+      '  ls -l             - list files',
+      '  cat [file]        - display a file',
+      '  clear             - clear the terminal',
+      '  help              - display available commands',
+      '  whoami            - display the username',
+      '  neofetch          - display system information',
+      '  exit              - close the terminal',
+      '  curl              - navigate to targeted URL',
+      '  Misc commands : cowsay [message], fortune, weather [city], ip a',
+      '  Press tab key to autocomplete !'
     ];
 
     let currentLine = 0;
@@ -97,6 +139,7 @@
     const terminalDiv = document.getElementById('terminal');
     const input = document.getElementById('commandInput');
     const prompt = document.getElementById('prompt');
+    const suggestionsContainer = document.getElementById('suggestionsContainer');
 
     function updatePrompt() {
       prompt.textContent = `guest@Delivlinux in ${currentDir} $`;
@@ -132,12 +175,21 @@
             suggestions = ['presentation.txt', 'cv.pdf'].filter(f => f.startsWith(partial));
           } else if (tokens[0] === 'cd') {
             suggestions = ['about', 'blog'].filter(d => d.startsWith(partial));
+          } else if (tokens[0] === 'cat' && currentDir === 'blog') {
+            // Si l'utilisateur tape 'cat' dans le dossier 'blog', récupère les titres des articles
+            if (window.blogArticles && window.blogArticles.length > 0) {
+              suggestions = window.blogArticles.map(article => article.title).filter(title => title.startsWith(partial));
+            }
           }
 
           if (suggestions.length === 1) {
             input.value = tokens[0] + ' ' + suggestions[0];
           } else if (suggestions.length > 1) {
-            bootDiv.innerHTML += 'Suggestions : ' + suggestions.join('  ') + '\n';
+            // Afficher les suggestions dans un conteneur séparé
+            suggestionsContainer.innerHTML = 'Suggestions : ' + suggestions.join('  ') + '\n';
+            suggestionsContainer.style.display = 'block';
+            suggestionsContainer.style.left = input.offsetLeft + 'px';
+            suggestionsContainer.style.top = input.offsetTop + input.offsetHeight + 'px';
             suggestionSpan.textContent = suggestions[0].substring(partial.length);
           }
         }
@@ -157,8 +209,20 @@
           if (currentDir === '~') menuDiv.style.display = 'block';
           else menuDiv.style.display = 'none';
         } else if (command === 'help') {
-          bootDiv.innerHTML += 'are you blacklisted on spamhaus?\n';
-        } else if (command === 'whoami') {
+  bootDiv.innerHTML += 'Commands available:\n';
+  bootDiv.innerHTML += '  cd [directory]    - enter a directory\n';
+  bootDiv.innerHTML += '  cd ..             - go back to the previous directory\n';
+  bootDiv.innerHTML += '  ls -l             - list files\n';
+  bootDiv.innerHTML += '  cat [file]        - display a file\n';
+  bootDiv.innerHTML += '  clear             - clear the terminal\n';
+  bootDiv.innerHTML += '  help              - display available commands\n';
+  bootDiv.innerHTML += '  whoami            - display the username\n';
+  bootDiv.innerHTML += '  neofetch          - display system information\n';
+  bootDiv.innerHTML += '  exit              - close the terminal\n';
+  bootDiv.innerHTML += '  curl              - navigate to target URL\n';
+  bootDiv.innerHTML += '  Misc commands : cowsay [message], fortune, weather [city], ip a\n';
+  bootDiv.innerHTML += '  Press tab key to autocomplete !\n';
+} else if (command === 'whoami') {
           bootDiv.innerHTML += 'You only knows...\n';
         } else if (command === 'neofetch') {
           bootDiv.innerHTML += bootLines.slice(5, 25).join('\n') + '\n';
@@ -169,8 +233,164 @@
           } else if (currentDir === 'about') {
             bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/presentation.txt')">presentation.txt</span>\n`;
             bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/cv.pdf')">cv.pdf</span>\n`;
+          } else if (currentDir === 'blog') {
+            if (window.blogArticles && window.blogArticles.length > 0) {
+              window.blogArticles.forEach(article => {
+                bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('blog/${article.slug}.json')">${article.title}</span>\n`;
+              });
+            } else {
+              bootDiv.innerHTML += `No blog articles found.\n`;
+            }
           }
-        } else if (command.startsWith('cd')) {
+        }
+        else if (command === 'ls') {
+  if (currentDir === '~') {
+    bootDiv.innerHTML += `drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('about')">about</span>\n`;
+    bootDiv.innerHTML += `drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('blog')">blog</span>\n`;
+  } else if (currentDir === 'about') {
+    bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/presentation.txt')">presentation.txt</span>\n`;
+    bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/cv.pdf')">cv.pdf</span>\n`;
+  } else if (currentDir === 'blog') {
+    if (window.blogArticles && window.blogArticles.length > 0) {
+      window.blogArticles.forEach(article => {
+        bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('blog/${article.slug}.json')">${article.title}</span>\n`;
+      });
+    } else {
+      bootDiv.innerHTML += `No blog articles found.\n`;
+    }
+  }
+}
+// Handle the weather command
+else if (command.startsWith('weather')) {
+  const city = command.substring(8).trim(); // Extract the city after 'weather'
+  if (city) {
+    getWeather(city);
+  } else {
+    bootDiv.innerHTML += "Usage: weather [city]\n";
+  }
+}
+else if (command === 'last') {
+  fetch('./blog/blog.json?v=' + Date.now())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data && data.length > 0) {
+        // Trier les articles par date (du plus récent au plus ancien)
+        data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        // Charger le premier article (le plus récent)
+        const lastArticle = data[0];
+
+        // Charger le fichier JSON complet de l'article avec un paramètre de version
+        fetch(`./blog/${lastArticle.slug}.json?v=${Date.now()}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(articleData => {
+            // Afficher la bannière
+            if (articleData.banner) {
+              bootDiv.innerHTML += `<img src="${articleData.banner}" alt="Banner" style="max-width: 100%; height: auto;">\n`;
+            }
+
+            // Afficher le titre
+            bootDiv.innerHTML += `# ${articleData.title}\n\n`;
+
+            // Afficher le contenu
+            articleData.content.forEach(part => {
+              if (part.type === "markdown") {
+                bootDiv.innerHTML += markdownToHTML(part.text) + "\n";
+              }
+            });
+          })
+          .catch(err => {
+            bootDiv.innerHTML += `Error loading article content: ${err.message}\n`;
+          });
+      } else {
+        bootDiv.innerHTML += "No articles found.\n";
+      }
+    })
+    .catch(err => {
+      bootDiv.innerHTML += `Error loading last article: ${err.message}\n`;
+    });
+}
+// Handle the cowsay command
+else if (command.startsWith('cowsay')) {
+  const message = command.substring(7).trim(); // Extract the message after 'cowsay'
+  if (message) {
+    bootDiv.innerHTML += cowsay(message) + '\n';
+  } else {
+    bootDiv.innerHTML += "Usage: cowsay [message]\n";
+  }
+}
+else if (command === 'ip a') {
+  bootDiv.innerHTML += "Fetching your public IP address...\n";
+
+  fetch('https://api.ipify.org?format=json')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      bootDiv.innerHTML += `Your public IP address is: ${data.ip}\n`;
+    })
+    .catch(err => {
+      bootDiv.innerHTML += `Error fetching IP address: ${err.message}\n`;
+    });
+}
+else if (command === 'fortune') {
+  const fortunes = [
+    "You will have a great day today!",
+    "A wise person once said, 'With great power comes great responsibility.'",
+    "You will soon meet someone who will change your life.",
+    "Today is the day to try something new.",
+    "Your hard work will pay off soon."
+  ];
+  const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+  bootDiv.innerHTML += `Fortune: ${randomFortune}\n`;
+}
+
+else if (command.startsWith('curl')) {
+  const url = command.split(' ')[1];
+  if (url) {
+    // Validate the URL to ensure it's safe to open
+    try {
+      const parsedUrl = new URL(url);
+      if (parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:') {
+        // Open the URL in a new tab
+        window.open(url, '_blank');
+        bootDiv.innerHTML += `Opening ${url}...\n`;
+      } else {
+        bootDiv.innerHTML += `Error: Only HTTP and HTTPS URLs are supported.\n`;
+      }
+    } catch (e) {
+      bootDiv.innerHTML += `Error: Invalid URL.\n`;
+    }
+  } else {
+    bootDiv.innerHTML += `Usage: curl <URL>\n`;
+  }
+}
+else if (command === 'clearcache') {
+  // Clear local storage
+  localStorage.clear();
+  // Clear session storage
+  sessionStorage.clear();
+  // Clear any in-memory caches
+  window.blogArticles = null; // Assuming this is where cached blog articles are stored
+  bootDiv.innerHTML += 'Cache cleared successfully.\n';
+}
+else if (command === 'exit') {
+  window.location.href = 'https://www.google.com/';
+}
+        else if (command.startsWith('cd')) {
           const target = command.split(' ')[1];
           if (target === '..') {
             currentDir = '~';
@@ -182,22 +402,35 @@
             currentDir = target;
             updatePrompt();
             menuDiv.style.display = 'none';
-            input.value = 'ls -l';
-            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+            navigateTo(target);
           } else {
-            bootDiv.innerHTML += `cd: ${target}: Aucun dossier de ce nom\n`;
+            bootDiv.innerHTML += `cd: ${target}: No files with this name\n`;
           }
         } else if (command.startsWith('cat')) {
-          const file = command.split(' ')[1];
+          const file = command.split(' ').slice(1).join(' ');
           if (file === 'presentation.txt' && currentDir === 'about') {
-            bootDiv.innerHTML += `Bonjour ! \n\nJe suis responsable délivrabilité au Groupe Positive où je m'assure que les messages de nos clients atteignent leur public cible de manière efficace et sécurisée. Mon expertise couvre :\n\n- Délivrabilité des Emails : Analyse et résolution des problèmes de softbounce et hardbounce, optimisation des taux de livraison.\n- Gestion de Projets : Coordination des initiatives marketing avec une approche centrée sur les résultats.\n\nSinon comme vous pouvez le constater, je suis un geek qui aime les projets farfelus, comme ce site ! :D\n`;
+            bootDiv.innerHTML += `Hello! \n\nI am the deliverability manager at Positive Group, where I ensure our clients' messages reach their target audience effectively and securely. My expertise includes:\n\n- Email Deliverability: Analysis and resolution of softbounce and hardbounce issues, optimization of delivery rates.\n- Project Management: Coordinating marketing initiatives with a results-driven approach.\n\nAs you can see, I'm also a geek who loves quirky projects, like this website! :D\n`;
           } else if (file === 'cv.pdf' && currentDir === 'about') {
             window.open('https://www.linkedin.com/in/alexandre-baverel-schmit/', '_blank');
           } else {
-            bootDiv.innerHTML += `cat: ${file}: Fichier introuvable\n`;
-          }
-        } else {
-          bootDiv.innerHTML += `Commande non reconnue : ${command}\n`;
+            // Gérer les titres d'articles complets
+            if (window.blogArticles && window.blogArticles.length > 0) {
+      const article = window.blogArticles.find(article =>
+        article.title === file ||
+        article.slug === file ||
+        file.includes(article.title)
+      );
+      if (article) {
+        loadBlogArticle(article.slug);
+      } else {
+        bootDiv.innerHTML += `cat: ${file}: File not found\n`;
+      }
+    } else {
+      bootDiv.innerHTML += `cat: ${file}: File not found\n`;
+    }
+  }
+} else {
+          bootDiv.innerHTML += `Command not found: ${command}\n`;
         }
         window.scrollTo(0, document.body.scrollHeight);
       }
@@ -206,93 +439,231 @@
     // Start boot animation
     bootDiv.style.display = 'block';
     showNextLine();
+
+// Function to display the cow with the given message
+function cowsay(message) {
+  const cow = `
+  \\
+   ^__^
+   (oo)\\_______
+   (__)\\       )\\/\\
+   ||----w |
+   ||     ||
+  `;
+
+  const messageBox = `| ${message} |`;
+  const border = `+${'-'.repeat(messageBox.length - 2)}+`;
+
+  return `
+${border}
+${messageBox}
+${border}
+${cow}
+  `;
+}
     // Définition de la fonction navigateTo
-function navigateTo(section) {
-  currentDir = section;  // Mise à jour du répertoire actuel
-  updatePrompt();  // Mise à jour du prompt avec le nouveau répertoire
-  menuDiv.style.display = 'none';  // Masquer le menu une fois que la navigation est effectuée
+    function navigateTo(section) {
+      currentDir = section;  // Mise à jour du répertoire actuel
+      updatePrompt();  // Mise à jour du prompt avec le nouveau répertoire
+      menuDiv.style.display = 'none';  // Masquer le menu une fois que la navigation est effectuée
 
-  // Lancer la commande 'ls -l' pour afficher les fichiers du répertoire
-  input.value = 'ls -l';  
-  input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
-}
-// Définir la fonction catFile qui sera appelée lors du clic sur un fichier
-// Fonction pour charger un article de blog avec bannière et contenu en Markdown
-function loadBlogArticle(slug) {
-  fetch(`./blog/${slug}.json`)
-    .then(response => response.json())
-    .then(data => {
-      // Affichage de la bannière
-      if (data.banner) {
-        bootDiv.innerHTML += `<img src="${data.banner}" alt="Bannière" style="width: 100%; max-width: 800px; margin-bottom: 10px;">\n`;
+      if (section === 'blog') {
+        loadBlogMenu();
+        // Attendre 500ms pour s'assurer que les articles sont chargés
+        setTimeout(() => {
+          input.value = 'ls -l';
+          input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+        }, 500);
+      } else {
+        input.value = 'ls -l';
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
       }
+    }
 
-      bootDiv.innerHTML += `\nArticle: ${data.title}\n`;
-
-      // Affichage du contenu de l'article
-      data.content.forEach(item => {
-        if (item.type === 'markdown') {
-          bootDiv.innerHTML += markdownToHTML(item.text);
-        }
-      });
-
-      window.scrollTo(0, document.body.scrollHeight);  // Pour faire défiler le contenu
-    })
-    .catch(err => {
-      bootDiv.innerHTML += `Erreur: ${err.message}\n`;
-    });
-}
-
-// Fonction pour afficher le contenu du fichier (en gérant les articles de blog aussi)
-function catFile(filePath) {
-  // Si le fichier commence par "blog/", on considère que c'est un article de blog
+    // Définir la fonction catFile qui sera appelée lors du clic sur un fichier
+    function catFile(filePath) {
   if (filePath.startsWith('blog/')) {
-    const slug = filePath.split('/')[1].replace('.json', '');  // Extraire le slug de l'URL
-    loadBlogArticle(slug);  // Charger l'article correspondant
-  } 
-  // Si c'est un fichier local classique (par exemple presentation.txt ou cv.pdf)
-  else {
-    if (filePath === 'about/presentation.txt') {
-      bootDiv.innerHTML += `Bonjour ! \n\nJe suis responsable délivrabilité au Groupe Positive où je m'assure que les messages de nos clients atteignent leur public cible de manière efficace et sécurisée. Mon expertise couvre :\n\n- Délivrabilité des Emails : Analyse et résolution des problèmes de softbounce et hardbounce, optimisation des taux de livraison.\n- Gestion de Projets : Coordination des initiatives marketing avec une approche centrée sur les résultats.\n\nSinon comme vous pouvez le constater, je suis un geek qui aime les projets farfelus, comme ce site ! :D\n`;
-    } else if (filePath === 'about/cv.pdf') {
-      window.open('https://www.linkedin.com/in/alexandre-baverel-schmit/', '_blank');
+    const slug = filePath.split('/')[1].replace('.json', '');
+    loadBlogArticle(slug);
+  } else if (filePath === 'about/presentation.txt') {
+    // ... (restant du code existant)
+  } else if (filePath === 'about/cv.pdf') {
+    // ... (restant du code existant)
+  } else {
+    // Gestion des titres d'articles complets
+    if (window.blogArticles && window.blogArticles.length > 0) {
+      const article = window.blogArticles.find(article =>
+        article.title === filePath ||
+        article.slug === filePath ||
+        filePath.includes(article.title)
+      );
+      if (article) {
+        loadBlogArticle(article.slug);
+      } else {
+        bootDiv.innerHTML += `cat: ${filePath}: File not found\n`;
+      }
     } else {
-      bootDiv.innerHTML += `cat: ${filePath}: Fichier introuvable\n`;
+      bootDiv.innerHTML += `cat: ${filePath}: File not found\n`;
     }
   }
 }
-// Fonction pour charger la liste des articles du blog depuis blog.json et les ajouter au menu
-function loadBlogMenu() {
-  fetch('./blog/blog.json')
-    .then(response => response.json())
+
+    // Fonction pour charger un article de blog avec bannière et contenu en Markdown
+    function loadBlogArticle(slug) {
+      fetch(`./blog/${slug}.json`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Affichage de la bannière
+          if (data.banner) {
+            bootDiv.innerHTML += `<img src="${data.banner}" alt="Bannière" style="width: 100%; max-width: 800px; margin-bottom: 10px;">\n`;
+          }
+
+          bootDiv.innerHTML += `\nArticle: ${data.title}\n`;
+
+          // Affichage du contenu de l'article
+          data.content.forEach(item => {
+            if (item.type === 'markdown') {
+              bootDiv.innerHTML += markdownToHTML(item.text);
+            }
+          });
+
+          window.scrollTo(0, document.body.scrollHeight);  // Pour faire défiler le contenu
+        })
+        .catch(err => {
+          bootDiv.innerHTML += `Erreur: ${err.message}\n`;
+        });
+    }
+
+    // Fonction pour charger la liste des articles du blog depuis blog.json et les ajouter au menu
+    function loadBlogMenu() {
+  const timestamp = new Date().getTime(); // Get current timestamp
+  bootDiv.innerHTML += "Loading blog articles...\n";
+  fetch('./blog/blog.json?t=' + timestamp)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
     .then(data => {
-      // Pour chaque article, on génère un lien
-      data.forEach(article => {
-        bootDiv.innerHTML += `<span class="link" onclick="catFile('blog/${article.slug}.json')">${article.title}</span><br>`;
-      });
+      window.blogArticles = data;
+      bootDiv.innerHTML += "Blog articles loaded successfully.\n";
     })
     .catch(err => {
-      bootDiv.innerHTML += `Erreur: ${err.message}\n`;
+      console.error(`Error: ${err.message}`);
+      bootDiv.innerHTML += `Error loading blog articles: ${err.message}\n`;
     });
 }
-// Charger le menu du blog à l'ouverture
-loadBlogMenu();
-// Simple Markdown to HTML converter
+// Function to decode a Base64 string
+function decodeBase64(base64String) {
+  return atob(base64String);
+}
+
+// Your Base64-encoded API key
+const encodedApiKey = 'YmM2NWNmYWExMmQwMGFjMzU4NmQzZTE5ZDBjNDI0MDg=';
+
+// Function to fetch weather data for a given city
+function getWeather(city) {
+  const apiKey = decodeBase64(encodedApiKey); // Decode the API key
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+  bootDiv.innerHTML += `Fetching weather data for ${city}...\n`;
+ // bootDiv.innerHTML += `API URL: ${apiUrl}\n`; // Debugging: Print the API URL
+
+  fetch(apiUrl)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      const temp = data.main.temp;
+      const description = data.weather[0].description;
+      const humidity = data.main.humidity;
+      const windSpeed = data.wind.speed;
+      const iconCode = data.weather[0].icon;
+      const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
+
+      bootDiv.innerHTML += `Weather in ${city}:\n`;
+      bootDiv.innerHTML += `Temperature: ${temp}°C\n`;
+      bootDiv.innerHTML += `Description: ${description}\n`;
+      bootDiv.innerHTML += `Humidity: ${humidity}%\n`;
+      bootDiv.innerHTML += `Wind Speed: ${windSpeed} m/s\n`;
+      bootDiv.innerHTML += `Weather Icon: <img src="${iconUrl}" alt="Weather Icon">\n`;
+    })
+    .catch(err => {
+      bootDiv.innerHTML += `Error: ${err.message}\n`;
+      bootDiv.innerHTML += `Please check the API key and try again.\n`;
+    });
+}
+// Enhanced Markdown to HTML converter
 function markdownToHTML(markdown) {
-  // Convertir les titres
-  markdown = markdown.replace(/^(#{1,6})\s*(.+)/g, (match, hashes, title) => {
+  // Process images first
+  markdown = markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+
+  // Process code blocks
+  markdown = markdown.replace(/```[\s\S]*?```/g, (match) => {
+    const codeContent = match.replace(/```/g, '');
+    return `<pre><code>${codeContent.trim()}</code></pre>`;
+  });
+
+  // Process inline code
+  markdown = markdown.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+  // Process bold text (**text**)
+  markdown = markdown.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+  // Process italic text (*text*)
+  markdown = markdown.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+  // Process headers
+  markdown = markdown.replace(/^(#{1,6})\s*(.+)/gm, (match, hashes, title) => {
     const level = hashes.length;
     return `<h${level}>${title}</h${level}>`;
   });
 
-  // Convertir les listes
-  markdown = markdown.replace(/^\s*\*\s*(.+)$/gm, "<ul><li>$1</li></ul>");
+  // Process lists
+  markdown = markdown.replace(/^\s*\*\s*(.+)$/gm, '<li>$1</li>');
+  markdown = markdown.replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>');
 
-  // Convertir les paragraphes
-  markdown = markdown.replace(/(?:^|\n)([^\n]+)(?:\n|$)/g, "<p>$1</p>");
-  
+  // Process paragraphs
+  markdown = markdown.replace(/(?:^|\n)([^\n]+)(?:\n|$)/g, '<p>$1</p>');
+
+  // Process horizontal rules
+  markdown = markdown.replace(/^---$/gm, '<hr />');
+
+  // Process links
+  markdown = markdown.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2">$1</a>');
+
+  // Process emojis (optional)
+  markdown = markdown.replace(/(:[a-z_]+:)/g, (emoji) => {
+    const emojiMap = {
+      ':smile:': '😊',
+      ':heart:': '❤️',
+      ':rocket:': '🚀',
+      ':wave:': '👋',
+      ':book:': '📖',
+      ':envelope:': '📩',
+      ':heavy_plus_sign:': '➕',
+      ':star:': '⭐',
+      ':email:': '💌'
+    };
+    return emojiMap[emoji] || emoji;
+  });
+
   return markdown;
 }
+
+    // Cacher le conteneur de suggestions lorsque l'utilisateur tape
+    input.addEventListener('keydown', () => {
+      suggestionsContainer.style.display = 'none';
+    });
   </script>
 </body>
 </html>
