@@ -495,14 +495,14 @@ ${cow}
     }
 
     // Définir la fonction catFile qui sera appelée lors du clic sur un fichier
-    function catFile(filePath) {
+function catFile(filePath) {
   if (filePath.startsWith('blog/')) {
     const slug = filePath.split('/')[1].replace('.json', '');
     loadBlogArticle(slug);
   } else if (filePath === 'about/presentation.txt') {
-    // ... (restant du code existant)
+    bootDiv.innerHTML += `Hello! \n\nI am the deliverability manager at Positive Group, where I ensure our clients' messages reach their target audience effectively and securely. My expertise includes:\n\n- Email Deliverability: Analysis and resolution of softbounce and hardbounce issues, optimization of delivery rates.\n- Project Management: Coordinating marketing initiatives with a results-driven approach.\n\nAs you can see, I'm also a geek who loves quirky projects, like this website! :D\n`;
   } else if (filePath === 'about/cv.pdf') {
-    // ... (restant du code existant)
+    window.open('https://www.linkedin.com/in/alexandre-baverel-schmit/', '_blank');
   } else {
     // Gestion des titres d'articles complets
     if (window.blogArticles && window.blogArticles.length > 0) {
@@ -521,7 +521,6 @@ ${cow}
     }
   }
 }
-
     // Fonction pour charger un article de blog avec bannière et contenu en Markdown
     function loadBlogArticle(slug) {
       fetch(`./blog/${slug}.json`)
