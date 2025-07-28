@@ -91,10 +91,34 @@
   <div id="suggestionsContainer" style="display: none; position: absolute; background: #111; color: #00ff00; padding: 5px; border: 1px solid #00ff00; z-index: 1000;"></div>
 
   <script>
+  const MONTHS_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  // Évite les surprises de fuseau horaire en créant la date en local
+  function parseISODateLocal(iso) {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  // Imitation de `ls -l` : "Mon dd HH:MM" si récent, sinon "Mon dd  YYYY"
+  function formatLsDate(isoDate, time = "00:00") {
+    const d = parseISODateLocal(isoDate);
+    const now = new Date();
+    const sixMonthsMs = 183 * 24 * 3600 * 1000; // ~6 mois
+    const mon = MONTHS_EN[d.getMonth()];
+    const day = String(d.getDate()).padStart(2, ' '); // espace à gauche comme `ls`
+    const sameYear = now.getFullYear() === d.getFullYear();
+    const recent = Math.abs(now - d) < sixMonthsMs;
+
+    if (recent && sameYear) {
+      return `${mon} ${day} ${time}`;
+    } else {
+      return `${mon} ${day}  ${d.getFullYear()}`;
+    }
+  }
     const bootLines = [
       'Starting Arch Linux...',
       '[ OK ] Mounted /boot',
-      '[ OK ] Started Network Manager',
+      '[ OK ] Started Network Manager',First, make sure you have a data structure that contains your blog articles with their respective dates. For example:
       '[ OK ] Reached target Graphical Interface',
       '',
       '                  -`                     Alexandre@Archlinux',
@@ -130,6 +154,7 @@
       '  curl              - navigate to targeted URL',
       '  licence           - Show licence and Git info',
       '  Misc commands : cowsay [message], fortune, weather [city], ip a',
+      '  last              - Show the latest article',
       '  Press tab key to autocomplete !'
     ];
 
@@ -223,6 +248,7 @@
   bootDiv.innerHTML += '  curl              - navigate to target URL\n';
   bootDiv.innerHTML += '  licence           - Show licence and Git info\n';
   bootDiv.innerHTML += '  Misc commands : cowsay [message], fortune, weather [city], ip a\n';
+  bootDiv.innerHTML += '  last              - Show the latest article\n';
   bootDiv.innerHTML += '  Press tab key to autocomplete !\n';
 } else if (command === 'whoami') {
           bootDiv.innerHTML += 'You only knows...\n';
@@ -366,6 +392,7 @@ else if (command === 'fortune') {
     "A wise person once said, 'With great power comes great responsibility.'",
     "You will soon meet someone who will change your life.",
     "Today is the day to try something new.",
+    "You lost the game.",
     "Your hard work will pay off soon."
   ];
   const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
