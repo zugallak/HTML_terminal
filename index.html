@@ -5,14 +5,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Port25 | Alexandre Schmit | Email Deliverability</title>
 <style>
+  /* --- NOUVEAU : Définition des thèmes --- */
+  :root {
+    /* Thème par défaut (Hacker) */
+    --bg-color: #111111;
+    --text-color: #00E000;
+    --code-bg: #222222;
+    --shadow-color: rgba(0, 255, 170, 0.5);
+  }
+
+  [data-theme="light"] {
+    --bg-color: #ffffff;
+    --text-color: #222222;
+    --code-bg: #f0f0f0;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+  }
+
+  [data-theme="ubuntu"] {
+    --bg-color: #300a24;
+    --text-color: #ffffff;
+    --code-bg: #5e2750;
+    --shadow-color: rgba(255, 255, 255, 0.2);
+  }
+
+  [data-theme="dracula"] {
+    --bg-color: #282a36;
+    --text-color: #f8f8f2;
+    --code-bg: #44475a;
+    --shadow-color: rgba(189, 147, 249, 0.5);
+  }
+
+  /* --- Application des variables --- */
   body {
-    background-color: #111;
-    color: #00E000;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     font-family: monospace;
     font-size: 14px;
     line-height: 1.5;
     padding: 20px;
     white-space: pre-wrap;
+    transition: background-color 0.3s, color 0.3s; /* Transition douce */
   }
 
   #boot, #menu, #terminal {
@@ -22,7 +54,7 @@
   .cursor {
     display: inline-block;
     width: 10px;
-    background: #00E000;
+    background: var(--text-color);
     animation: blink 1s infinite;
   }
 
@@ -34,7 +66,7 @@
   #commandInput {
     background: transparent;
     border: none;
-    color: #00E000;
+    color: var(--text-color);
     font-family: monospace;
     font-size: inherit;
     width: 50%;
@@ -44,37 +76,44 @@
   }
 
   .link {
-    color: #00E000;
+    color: var(--text-color);
     text-decoration: underline;
     cursor: pointer;
     transition: all 0.3s ease;
   }
 
   .link:hover {
-    color: #FFFFFF;
-    text-shadow: 0 0 5px #00E000;
+    color: var(--bg-color);
+    background-color: var(--text-color);
+    text-shadow: none;
   }
 
   #suggestionsContainer {
     position: absolute;
-    background: #111;
-    color: #00E000;
+    background: var(--bg-color);
+    color: var(--text-color);
     padding: 10px;
-    border: 1px solid #00E000;
+    border: 1px solid var(--text-color);
     border-radius: 5px;
     z-index: 1000;
-    box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+    box-shadow: 0 0 10px var(--shadow-color);
     max-width: 50%;
   }
-    pre code {
-    background-color: #222; /* Background color for code blocks */
-    color: #00E000; /* Text color for code blocks */
-    padding: 10px; /* Padding around code blocks */
-    border-radius: 5px; /* Rounded corners for code blocks */
-    overflow: auto; /* Auto-scroll for long code blocks */
-    white-space: pre; /* Preserve whitespace in code blocks */
-    display: block; /* Make code blocks block-level elements */
-    margin: 10px 0; /* Margin around code blocks */
+
+  pre code {
+    background-color: var(--code-bg);
+    color: var(--text-color);
+    padding: 10px;
+    border-radius: 5px;
+    overflow: auto;
+    white-space: pre;
+    display: block;
+    margin: 10px 0;
+  }
+
+  #suggestion {
+    font-style: italic;
+    opacity: 0.6; /* Remplace la couleur forcée par une transparence */
   }
 </style>
 <script type="application/ld+json">
@@ -158,9 +197,9 @@
     drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('blog')">blog</span>
   </div>
   <div id="terminal">
-    <span id="prompt">guest@Delivlinux in ~ $</span><input type="text" id="commandInput" autocomplete="off"><span id="suggestion" style="font-style: italic; color: #00ff00;"></span>
+    <span id="prompt">guest@Delivlinux in ~ $</span><input type="text" id="commandInput" autocomplete="off"><span id="suggestion"></span>
   </div>
-  <div id="suggestionsContainer" style="display: none; position: absolute; background: #111; color: #00ff00; padding: 5px; border: 1px solid #00ff00; z-index: 1000;"></div>
+  <div id="suggestionsContainer" style="display: none;"></div>
 
   <script>
     const bootLines = [
@@ -214,9 +253,14 @@
     const input = document.getElementById('commandInput');
     const prompt = document.getElementById('prompt');
     const suggestionsContainer = document.getElementById('suggestionsContainer');
+
     // Analyse de l'URL pour trouver un paramètre "article"
     const urlParams = new URLSearchParams(window.location.search);
     const articleToLoad = urlParams.get('article');
+
+    // --- NOUVEAU : Variables pour l'historique ---
+    let commandHistory = [];
+    let historyIndex = -1;
 
     function updatePrompt() {
       prompt.textContent = `guest@Delivlinux in ${currentDir} $`;
@@ -286,8 +330,38 @@
         return;
       }
 
+      // --- NOUVEAU : Navigation dans l'historique avec Flèche Haut ---
+      if (e.key === 'ArrowUp') {
+        e.preventDefault(); // Empêche le curseur de bouger tout seul
+        if (historyIndex > 0) {
+          historyIndex--; // On recule dans l'historique
+          input.value = commandHistory[historyIndex];
+        }
+        return;
+      }
+
+      // --- NOUVEAU : Navigation dans l'historique avec Flèche Bas ---
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++; // On avance dans l'historique
+          input.value = commandHistory[historyIndex];
+        } else {
+          historyIndex = commandHistory.length; // On est revenu au présent
+          input.value = ''; // On vide le champ
+        }
+        return;
+      }
+
       if (e.key === 'Enter') {
         const command = input.value.trim();
+
+        // --- NOUVEAU : On sauvegarde la commande dans l'historique ---
+        if (command !== '') {
+          commandHistory.push(command);
+          historyIndex = commandHistory.length; // On met à jour la position
+        }
+
         input.value = '';
         bootDiv.innerHTML += `\n${prompt.textContent} ${command}\n`;
         menuDiv.style.display = 'none';
@@ -296,6 +370,25 @@
           bootDiv.innerHTML = '';
           if (currentDir === '~') menuDiv.style.display = 'block';
           else menuDiv.style.display = 'none';
+
+        // --- NOUVEAU : Commande theme ---
+        } else if (command.startsWith('theme')) {
+          const newTheme = command.split(' ')[1];
+          const validThemes = ['hacker', 'light', 'ubuntu', 'dracula'];
+
+          if (!newTheme) {
+            bootDiv.innerHTML += `Usage: theme [name]\nAvailable themes: ${validThemes.join(', ')}\n`;
+          } else if (validThemes.includes(newTheme)) {
+            if (newTheme === 'hacker') {
+              document.documentElement.removeAttribute('data-theme'); // Retour au thème par défaut
+            } else {
+              document.documentElement.setAttribute('data-theme', newTheme);
+            }
+            bootDiv.innerHTML += `Theme successfully changed to '${newTheme}'.\n`;
+          } else {
+            bootDiv.innerHTML += `Error: Theme '${newTheme}' not found.\nAvailable themes: ${validThemes.join(', ')}\n`;
+          }
+
         } else if (command === 'help') {
   bootDiv.innerHTML += 'Commands available:\n';
   bootDiv.innerHTML += '  cd [directory]    - enter a directory\n';
@@ -312,6 +405,7 @@
   bootDiv.innerHTML += '  Misc commands : cowsay [message], fortune, weather [city], ip a\n';
   bootDiv.innerHTML += '  last              - Show the latest article\n';
   bootDiv.innerHTML += '  Press tab key to autocomplete !\n';
+  bootDiv.innerHTML += '  theme [name]      - Change terminal theme (hacker, light, ubuntu, dracula)\n';
 } else if (command === 'whoami') {
           bootDiv.innerHTML += 'You only knows...\n';
         } else if (command === 'neofetch') {
