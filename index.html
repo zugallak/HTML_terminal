@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Terminal Portfolio</title>
+  <title>Port25 | Alexandre Schmit | Email Deliverability</title>
 <style>
   body {
     background-color: #111;
@@ -77,6 +77,78 @@
     margin: 10px 0; /* Margin around code blocks */
   }
 </style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://port25.sh/#alexandre",
+      "name": "Alexandre Schmit",
+      "url": "https://port25.sh/",
+      "email": "mailto:alex@port25.sh",
+      "sameAs": [
+        "https://www.linkedin.com/in/alexandre-baverel-schmit/"
+      ],
+      "jobTitle": "Deliverability Manager",
+      "description": "Deliverability Manager writing about email deliverability, SMTP, SPF, DKIM, DMARC and email infrastructure.",
+      "knowsAbout": [
+        "email deliverability",
+        "SMTP",
+        "SPF",
+        "DKIM",
+        "DMARC",
+        "email authentication",
+        "mail transfer agents",
+        "email infrastructure"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://port25.sh/#website",
+      "url": "https://port25.sh/",
+      "name": "Port25",
+      "description": "Technical blog and portfolio about email deliverability and infrastructure.",
+      "author": {
+        "@id": "https://port25.sh/#alexandre"
+      },
+      "publisher": {
+        "@id": "https://port25.sh/#alexandre"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebPage",
+      "@id": "https://port25.sh/#webpage",
+      "url": "https://port25.sh/",
+      "name": "Port25",
+      "isPartOf": {
+        "@id": "https://port25.sh/#website"
+      },
+      "about": {
+        "@id": "https://port25.sh/#alexandre"
+      },
+      "inLanguage": "en"
+    },
+    {
+      "@type": "Blog",
+      "@id": "https://port25.sh/blog/#blog",
+      "url": "https://port25.sh/blog/",
+      "name": "Port25 Blog",
+      "isPartOf": {
+        "@id": "https://port25.sh/#website"
+      },
+      "author": {
+        "@id": "https://port25.sh/#alexandre"
+      },
+      "publisher": {
+        "@id": "https://port25.sh/#alexandre"
+      },
+      "inLanguage": "en"
+    }
+  ]
+}
+</script>
 </head>
 <body>
   <div id="boot"></div>
@@ -91,34 +163,10 @@
   <div id="suggestionsContainer" style="display: none; position: absolute; background: #111; color: #00ff00; padding: 5px; border: 1px solid #00ff00; z-index: 1000;"></div>
 
   <script>
-  const MONTHS_EN = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-
-  // Évite les surprises de fuseau horaire en créant la date en local
-  function parseISODateLocal(iso) {
-    const [y, m, d] = iso.split('-').map(Number);
-    return new Date(y, m - 1, d);
-  }
-
-  // Imitation de `ls -l` : "Mon dd HH:MM" si récent, sinon "Mon dd  YYYY"
-  function formatLsDate(isoDate, time = "00:00") {
-    const d = parseISODateLocal(isoDate);
-    const now = new Date();
-    const sixMonthsMs = 183 * 24 * 3600 * 1000; // ~6 mois
-    const mon = MONTHS_EN[d.getMonth()];
-    const day = String(d.getDate()).padStart(2, ' '); // espace à gauche comme `ls`
-    const sameYear = now.getFullYear() === d.getFullYear();
-    const recent = Math.abs(now - d) < sixMonthsMs;
-
-    if (recent && sameYear) {
-      return `${mon} ${day} ${time}`;
-    } else {
-      return `${mon} ${day}  ${d.getFullYear()}`;
-    }
-  }
     const bootLines = [
       'Starting Arch Linux...',
       '[ OK ] Mounted /boot',
-      '[ OK ] Started Network Manager',First, make sure you have a data structure that contains your blog articles with their respective dates. For example:
+      '[ OK ] Started Network Manager',
       '[ OK ] Reached target Graphical Interface',
       '',
       '                  -`                     Alexandre@Archlinux',
@@ -313,13 +361,9 @@ else if (command === 'last') {
     })
     .then(data => {
       if (data && data.length > 0) {
-        // Trier les articles par date (du plus récent au plus ancien)
         data.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        // Charger le premier article (le plus récent)
         const lastArticle = data[0];
 
-        // Charger le fichier JSON complet de l'article avec un paramètre de version
         fetch(`./blog/${lastArticle.slug}.json?v=${Date.now()}`)
           .then(response => {
             if (!response.ok) {
@@ -328,20 +372,21 @@ else if (command === 'last') {
             return response.json();
           })
           .then(articleData => {
-            // Afficher la bannière
+            injectArticleSchema(articleData, lastArticle.slug);
+
             if (articleData.banner) {
               bootDiv.innerHTML += `<img src="${articleData.banner}" alt="Banner" style="max-width: 100%; height: auto;">\n`;
             }
 
-            // Afficher le titre
             bootDiv.innerHTML += `# ${articleData.title}\n\n`;
 
-            // Afficher le contenu
             articleData.content.forEach(part => {
               if (part.type === "markdown") {
                 bootDiv.innerHTML += markdownToHTML(part.text) + "\n";
               }
             });
+
+            window.scrollTo(0, document.body.scrollHeight);
           })
           .catch(err => {
             bootDiv.innerHTML += `Error loading article content: ${err.message}\n`;
@@ -354,6 +399,7 @@ else if (command === 'last') {
       bootDiv.innerHTML += `Error loading last article: ${err.message}\n`;
     });
 }
+
 // Handle the cowsay command
 else if (command.startsWith('cowsay')) {
   const message = command.substring(7).trim(); // Extract the message after 'cowsay'
@@ -392,7 +438,6 @@ else if (command === 'fortune') {
     "A wise person once said, 'With great power comes great responsibility.'",
     "You will soon meet someone who will change your life.",
     "Today is the day to try something new.",
-    "You lost the game.",
     "Your hard work will pay off soon."
   ];
   const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
@@ -548,36 +593,76 @@ function catFile(filePath) {
     }
   }
 }
+function injectArticleSchema(article, slug) {
+  const oldSchema = document.getElementById('article-schema');
+  if (oldSchema) oldSchema.remove();
+
+  const articleUrl = `https://port25.sh/blog/${slug}`;
+
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${articleUrl}#article`,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": articleUrl
+    },
+    "headline": article.title,
+    "author": {
+      "@id": "https://port25.sh/#alexandre"
+    },
+    "publisher": {
+      "@id": "https://port25.sh/#alexandre"
+    },
+    "url": articleUrl,
+    "datePublished": article.date,
+    "dateModified": article.date,
+    "inLanguage": "en"
+  };
+
+  if (article.banner) {
+    schema.image = {
+      "@type": "ImageObject",
+      "url": article.banner
+    };
+  }
+
+  const script = document.createElement('script');
+  script.type = 'application/ld+json';
+  script.id = 'article-schema';
+  script.textContent = JSON.stringify(schema);
+  document.head.appendChild(script);
+}
     // Fonction pour charger un article de blog avec bannière et contenu en Markdown
-    function loadBlogArticle(slug) {
-      fetch(`./blog/${slug}.json`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          // Affichage de la bannière
-          if (data.banner) {
-            bootDiv.innerHTML += `<img src="${data.banner}" alt="Bannière" style="width: 100%; max-width: 800px; margin-bottom: 10px;">\n`;
-          }
+function loadBlogArticle(slug) {
+  fetch(`./blog/${slug}.json`)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      injectArticleSchema(data, slug);
 
-          bootDiv.innerHTML += `\nArticle: ${data.title}\n`;
+      if (data.banner) {
+        bootDiv.innerHTML += `<img src="${data.banner}" alt="Bannière" style="width: 100%; max-width: 800px; margin-bottom: 10px;">\n`;
+      }
 
-          // Affichage du contenu de l'article
-          data.content.forEach(item => {
-            if (item.type === 'markdown') {
-              bootDiv.innerHTML += markdownToHTML(item.text);
-            }
-          });
+      bootDiv.innerHTML += `\nArticle: ${data.title}\n`;
 
-          window.scrollTo(0, document.body.scrollHeight);  // Pour faire défiler le contenu
-        })
-        .catch(err => {
-          bootDiv.innerHTML += `Erreur: ${err.message}\n`;
-        });
-    }
+      data.content.forEach(item => {
+        if (item.type === 'markdown') {
+          bootDiv.innerHTML += markdownToHTML(item.text);
+        }
+      });
+
+      window.scrollTo(0, document.body.scrollHeight);
+    })
+    .catch(err => {
+      bootDiv.innerHTML += `Erreur: ${err.message}\n`;
+    });
+}
 
     // Fonction pour charger la liste des articles du blog depuis blog.json et les ajouter au menu
     function loadBlogMenu() {
