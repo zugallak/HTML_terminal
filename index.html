@@ -202,6 +202,11 @@
   <div id="suggestionsContainer" style="display: none;"></div>
 
   <script>
+    const savedTheme = localStorage.getItem('terminal-theme');
+    if (savedTheme && savedTheme !== 'hacker') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+
     const bootLines = [
       'Starting Arch Linux...',
       '[ OK ] Mounted /boot',
@@ -242,6 +247,7 @@
       '  licence           - Show licence and Git info',
       '  Misc commands : cowsay [message], fortune, weather [city], ip a',
       '  last              - Show the latest article',
+      '  theme [name]      - Change terminal theme (hacker, light, ubuntu, dracula)',
       '  Press tab key to autocomplete !'
     ];
 
@@ -380,13 +386,13 @@
             bootDiv.innerHTML += `Usage: theme [name]\nAvailable themes: ${validThemes.join(', ')}\n`;
           } else if (validThemes.includes(newTheme)) {
             if (newTheme === 'hacker') {
-              document.documentElement.removeAttribute('data-theme'); // Retour au thème par défaut
+              document.documentElement.removeAttribute('data-theme');
+              localStorage.removeItem('terminal-theme'); // On supprime la sauvegarde pour revenir au défaut
             } else {
               document.documentElement.setAttribute('data-theme', newTheme);
+              localStorage.setItem('terminal-theme', newTheme);
             }
             bootDiv.innerHTML += `Theme successfully changed to '${newTheme}'.\n`;
-          } else {
-            bootDiv.innerHTML += `Error: Theme '${newTheme}' not found.\nAvailable themes: ${validThemes.join(', ')}\n`;
           }
 
         } else if (command === 'help') {
