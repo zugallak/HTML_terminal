@@ -1,0 +1,67 @@
+[
+  {
+    "slug": "ovh-smtp-rate-limiting",
+    "title": "ovh-smtp-rate-limiting",
+    "date": "2026-04-28"
+  },
+  {
+    "slug": "unsubscribe_links",
+    "title": "We_Need_to_Talk_About_Unsubscribe_Links",
+    "date": "2025-06-03"
+  },
+  {
+    "slug": "Microsoft",
+    "title": "Microsoft_Tightens_Email_Rules",
+    "date": "2025-05-01"
+  },
+  {
+    "slug": "noreply",
+    "title": "No-Reply_Addresses",
+    "date": "2025-03-21"
+  },
+  {
+    "slug": "entrust_bimi_certificates",
+    "title": "BIMI_Certificates_Why_Entrust_is_in_Trouble",
+    "date": "2025-01-02"
+  },
+  {
+    "slug": "future_of_email_deliverability",
+    "title": "The_Future_of_Email_Deliverability",
+    "date": "2024-10-11"
+  },
+  {
+    "slug": "dns_records_ns_soa",
+    "title": "Everything_You_Need_to_Know_About_DNS_Records_NS_and_SOA",
+    "date": "2024-10-07"
+  },
+  {
+    "slug": "demystify_dns_cname_txt",
+    "title": "Everything You Need to Know About DNS: Demystifying CNAME and TXT Records",
+    "date": "2024-10-04"
+  },
+  {
+    "slug": "understanding_managing_bounces",
+    "title": "Understanding and Managing Bounces: Improve Your Deliverability by Mastering Email Returns",
+    "date": "2024-10-03"
+  },
+  {
+    "slug": "importance_of_contact_list_hygiene",
+    "title": "The Importance of Contact List Hygiene: Improve Your Deliverability and Recipient Engagement",
+    "date": "2024-10-02"
+  },
+  {
+    "slug": "managing_improving_sender_reputation",
+    "title": "Managing and Improving Your Sender Reputation: Keys to Optimizing Your Deliverability",
+    "date": "2024-10-01"
+  },
+  {
+    "slug": "everything_about_bimi",
+    "title": "Everything You Need to Know About BIMI: Strengthen Your Brand and Deliverability with Visual Indicators",
+    "date": "2024-09-27"
+  },
+  {
+    "slug": "everything_about_dmarc",
+    "title": "Everything You Need to Know About DMARC: Protect Your Domain and Improve Deliverability",
+    "date": "2024-09-26"
+  }
+]

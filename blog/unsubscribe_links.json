@@ -1,0 +1,11 @@
+{
+  "slug": "unsubscribe_links",
+  "title": "We_Need_to_Talk_About_Unsubscribe_Links",
+  "banner": "https://port25.sh/blog/img/1748966205957.png",
+  "content": [
+    {
+      "type": "markdown",
+      "text": "# We Need to Talk About Unsubscribe Links 📩\n\nJune 3, 2025\n\nYes, I know, the topic might seem boring or even a bit scary. But in reality, unsubscribe links are fantastic! Why? Because they improve your deliverability, customer engagement, and even your reputation. Let me explain.\n\n## Why Unsubscribe Links Are Your Best Friends 👋\n\nWhen recipients want to unsubscribe from your emails, the worst scenario is if they can't easily find how to do it. Result? They mark your email as spam. Ouch! That hurts your reputation, and your deliverability takes a hit.\n\nConversely, if you offer a clear, visible, and easy-to-use unsubscribe option, you allow recipients to respectfully manage their relationship with you. Result? Fewer complaints, more trust, and ultimately, better overall engagement.\n\n## A Personal Story 📖\n\nThroughout my career as a CRM manager, I consistently adopted a straightforward approach: placing not just one, but two clearly visible unsubscribe links. The first one, traditional, was placed at the bottom of the email. The second was located just below the \"view online\" link at the top of the email.\n\nAnd the outcome? Spam complaints significantly decreased. And guess what: overall engagement with my campaigns increased because my emails more frequently landed in the primary inbox, thanks to improved reputation and deliverability.\n\n## Some Best Practices to Keep in Mind 🚀\n\n* **Two links are better than one**: Always place at least one link at the top (near the mirror link) and another at the bottom of your email.\n* **Maximize visibility**: Avoid hiding the unsubscribe link behind tiny text or barely visible colors.\n* **Simple and quick process**: The fewer steps, the better. Ideally, one click should do the trick.\n\nSo there you have it, don't fear unsubscribe links! On the contrary, proudly showcase them. Your recipients (and your deliverability) will thank you! 💌"
+    }
+  ]
+}
