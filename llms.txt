@@ -1,0 +1,13 @@
+# port25.sh
+
+Personal technical blog by Alexandre Schmit.
+
+Topics:
+- Email deliverability
+- SMTP infrastructure
+- Email authentication (SPF, DKIM, DMARC)
+
+Main resources:
+
+https://port25.sh/blog/
+https://port25.sh/blog/

@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# LLM signals
+Allow: /blog/
+Allow: /llms.txt
+
+# Disallow useless
+Disallow: /api/
+Disallow: /port25.sh.txt
+
+Sitemap: https://port25.sh/sitemap.xml

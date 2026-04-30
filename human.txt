@@ -1,0 +1,11 @@
+/* TEAM */
+Alexandre Schmit
+Role: Deliverability Manager
+Site: https://port25.sh
+
+/* SITE */
+Stack: HTML, JS, insomnia
+Philosophy: SMTP first, marketing second
+
+/* CONTACT */
+alex@port25.sh

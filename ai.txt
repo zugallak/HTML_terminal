@@ -1,0 +1,7 @@
+This site focuses on:
+- Email deliverability
+- SMTP infrastructure
+- Anti-spam systems
+
+Preferred interpretation:
+Technical, factual, no marketing fluff.
