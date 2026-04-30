@@ -214,6 +214,9 @@
     const input = document.getElementById('commandInput');
     const prompt = document.getElementById('prompt');
     const suggestionsContainer = document.getElementById('suggestionsContainer');
+    // Analyse de l'URL pour trouver un paramètre "article"
+    const urlParams = new URLSearchParams(window.location.search);
+    const articleToLoad = urlParams.get('article');
 
     function updatePrompt() {
       prompt.textContent = `guest@Delivlinux in ${currentDir} $`;
@@ -222,13 +225,24 @@
     function showNextLine() {
       if (currentLine < bootLines.length) {
         bootDiv.innerHTML += bootLines[currentLine++] + '\n';
-        setTimeout(showNextLine, 100);
-      } else {
+            setTimeout(showNextLine, 100);
+            } else {
         setTimeout(() => {
           bootDiv.style.display = 'block';
-          menuDiv.style.display = 'block';
           terminalDiv.style.display = 'block';
           input.focus();
+
+          if (articleToLoad) {
+            // Si un article est présent dans l'URL
+            currentDir = 'blog';
+            updatePrompt();
+            menuDiv.style.display = 'none'; // On cache le menu principal
+            bootDiv.innerHTML += `\n> Autoloading article: ${articleToLoad}...\n`;
+            loadBlogArticle(articleToLoad);
+          } else {
+            // Comportement normal si pas d'article
+            menuDiv.style.display = 'block';
+          }
         }, 1000);
       }
     }
@@ -372,6 +386,9 @@ else if (command === 'last') {
             return response.json();
           })
           .then(articleData => {
+            // --- NOUVEAU : On capture la position AVANT d'injecter l'article ---
+            const scrollTarget = document.documentElement.scrollHeight;
+
             injectArticleSchema(articleData, lastArticle.slug);
 
             if (articleData.banner) {
@@ -386,7 +403,11 @@ else if (command === 'last') {
               }
             });
 
-            window.scrollTo(0, document.body.scrollHeight);
+            // --- NOUVEAU : On scrolle précisément vers le début de l'article ---
+            window.scrollTo({
+              top: scrollTarget,
+              behavior: 'smooth'
+            });
           })
           .catch(err => {
             bootDiv.innerHTML += `Error loading article content: ${err.message}\n`;
@@ -643,6 +664,9 @@ function loadBlogArticle(slug) {
       return response.json();
     })
     .then(data => {
+      // 1. On mémorise la hauteur actuelle du document AVANT l'ajout de l'article
+      const scrollTarget = document.documentElement.scrollHeight;
+
       injectArticleSchema(data, slug);
 
       if (data.banner) {
@@ -657,7 +681,12 @@ function loadBlogArticle(slug) {
         }
       });
 
-      window.scrollTo(0, document.body.scrollHeight);
+      // 2. Au lieu d'aller tout en bas, on scrolle vers le début de l'article
+      // On utilise 'smooth' pour un effet de glissement plus agréable
+      window.scrollTo({
+        top: scrollTarget,
+        behavior: 'smooth'
+      });
     })
     .catch(err => {
       bootDiv.innerHTML += `Erreur: ${err.message}\n`;
