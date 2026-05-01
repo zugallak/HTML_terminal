@@ -150,6 +150,12 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
   <div id="suggestionsContainer" style="display: none;"></div>
 
   <script>
+    // --- Initialisation au tout début pour garantir la présence des articles ---
+    function loadBlogMenu() {
+      fetch('./blog/blog.json?v='+Date.now()).then(res => res.json()).then(data => window.blogArticles = data);
+    }
+    loadBlogMenu();
+
     const savedTheme = localStorage.getItem('terminal-theme');
     if (savedTheme && savedTheme !== 'dracula') {
       document.documentElement.setAttribute('data-theme', savedTheme);
@@ -231,17 +237,20 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
     function showNextLine() {
       if (currentLine < bootLines.length) {
         bootDiv.innerHTML += bootLines[currentLine++] + '\n';
-        setTimeout(showNextLine, 40); // Accéléré un peu pour la fluidité
+        setTimeout(showNextLine, 60);
       } else {
         setTimeout(() => {
           bootDiv.style.display = 'block';
           terminalDiv.style.display = 'block';
           input.focus();
+
           if (articleToLoad) {
             currentDir = 'blog';
             updatePrompt();
             menuDiv.style.display = 'none';
-            loadBlogArticle(articleToLoad);
+            // Simulation visuelle de la commande
+            bootDiv.innerHTML += `\n${prompt.textContent} cat ${articleToLoad}\n`;
+            catFile(articleToLoad);
           } else {
             menuDiv.style.display = 'block';
           }
@@ -285,7 +294,7 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
 
         if (cmdMatch) {
           const cmd = cmdMatch[1].toLowerCase();
-          const partial = cmdMatch[2].toLowerCase(); // On passe en minuscules pour la recherche
+          const partial = cmdMatch[2].toLowerCase();
           let suggestions = [];
 
           if (cmd === 'cat' && currentDir === 'about') {
@@ -293,9 +302,9 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
           } else if (cmd === 'cd') {
             suggestions = ['about', 'blog'].filter(d => d.toLowerCase().startsWith(partial));
           } else if (cmd === 'cat' && currentDir === 'blog' && window.blogArticles) {
-            // On cherche d'abord dans les titres
+            // L'autocomplétion gère maintenant les espaces (recherche sur le titre d'abord)
             suggestions = window.blogArticles.map(a => a.title).filter(t => t.toLowerCase().startsWith(partial));
-            // Si on ne trouve rien, on cherche dans les slugs
+            // S'il n'y a pas de match sur le titre, on essaie sur le slug
             if (suggestions.length === 0) {
               suggestions = window.blogArticles.map(a => a.slug).filter(s => s.toLowerCase().startsWith(partial));
             }
@@ -324,14 +333,12 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
         const command = input.value.trim();
         const displayCommand = command.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-        // === GESTION DU MODE TELNET ===
         if (telnetMode) {
           input.value = '';
           bootDiv.innerHTML += `${displayCommand}\n`;
           if (command.toLowerCase() === 'quit') {
             bootDiv.innerHTML += "221 2.0.0 Bye\nConnection closed by foreign host.\n";
             telnetMode = false; updatePrompt(); prompt.style.display = "inline"; input.style.marginLeft = "10px";
-            window.scrollTo(0, document.body.scrollHeight);
             return;
           }
           switch (smtpStep) {
@@ -374,35 +381,23 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
           return;
         }
 
-        // === COMMANDES CLASSIQUES ===
         if (command !== '') { commandHistory.push(command); historyIndex = commandHistory.length; }
         input.value = '';
         bootDiv.innerHTML += `\n${prompt.textContent} ${displayCommand}\n`;
         menuDiv.style.display = 'none';
 
         if (command === 'clear') { bootDiv.innerHTML = ''; if (currentDir === '~') menuDiv.style.display = 'block'; }
-
         else if (command === 'help') {
           const helpStart = bootLines.findIndex(line => line === 'Commands available :');
-          if (helpStart !== -1) {
-            bootLines.slice(helpStart).forEach(l => bootDiv.innerHTML += l + '\n');
-          }
+          if (helpStart !== -1) bootLines.slice(helpStart).forEach(l => bootDiv.innerHTML += l + '\n');
         }
-
-        else if (command === 'whoami') {
-          bootDiv.innerHTML += 'You only knows...\n';
-        }
-
-        else if (command === 'neofetch') {
-          bootDiv.innerHTML += bootLines.slice(5, 23).join('\n') + '\n';
-        }
-
+        else if (command === 'whoami') bootDiv.innerHTML += 'You only knows...\n';
+        else if (command === 'neofetch') bootDiv.innerHTML += bootLines.slice(5, 23).join('\n') + '\n';
         else if (command === 'licence') {
           bootDiv.innerHTML += 'Terminal Portfolio is licensed under CC BY-NC-ND 4.0\n';
           bootDiv.innerHTML += 'Source code available at: [https://github.com/zugallak/HTML_terminal](https://github.com/zugallak/HTML_terminal)\n';
           bootDiv.innerHTML += 'This means you can share this work with proper attribution,\nbut cannot use it commercially or create derivative works.\n';
         }
-
         else if (command.startsWith('theme')) {
           const t = command.split(' ')[1];
           if (['hacker', 'light', 'ubuntu', 'dracula'].includes(t)) {
@@ -411,7 +406,6 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
             bootDiv.innerHTML += `Theme changed to ${t}.\n`;
           } else bootDiv.innerHTML += "Usage: theme [hacker|light|ubuntu|dracula]\n";
         }
-
         else if (command.startsWith('curl')) {
           const url = command.split(' ')[1];
           if (url) {
@@ -422,7 +416,6 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
             } catch (e) { bootDiv.innerHTML += "Error: Invalid URL\n"; }
           } else bootDiv.innerHTML += "Usage: curl [URL]\n";
         }
-
         else if (command.startsWith('dig')) {
           const parts = command.split(' ').filter(p => p.length > 0);
           const types = ['A', 'MX', 'TXT', 'CNAME', 'NS', 'AAAA', 'SOA', 'PTR'];
@@ -432,7 +425,6 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
           if (!domain) bootDiv.innerHTML += "Usage: dig [domain] [type]\n";
           else await executeDig(domain, type);
         }
-
         else if (command.startsWith('grep')) {
           const kw = command.substring(5).trim().toLowerCase();
           if (!kw) bootDiv.innerHTML += "Usage: grep [keyword]\n";
@@ -441,14 +433,13 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
             fetch('./blog/blog.json').then(res => res.json()).then(articles => {
               Promise.all(articles.map(a => fetch(`./blog/${a.slug}.json`).then(r => r.json()))).then(results => {
                 const matches = results.filter(r => r.title.toLowerCase().includes(kw) || JSON.stringify(r.content).toLowerCase().includes(kw));
-                if (matches.length > 0) matches.forEach(m => bootDiv.innerHTML += `- <span class="link" onclick="catFile('blog/${m.slug}.json')">${m.title}</span>\n`);
+                if (matches.length > 0) matches.forEach(m => bootDiv.innerHTML += `- <span class="link" onclick="catFile('${m.slug}.txt')">${m.title}</span>\n`);
                 else bootDiv.innerHTML += "No matches found.\n";
                 window.scrollTo(0, document.body.scrollHeight);
               });
             });
           }
         }
-
         else if (command.startsWith('telnet')) {
           telnetMode = true; smtpStep = 0; smtpData = { from: '', message: [] };
           bootDiv.innerHTML += "Trying 51.91.x.x...\nConnected to port25.sh.\nEscape character is '^]'.\n";
@@ -467,34 +458,35 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
           prompt.style.display = "none"; input.style.marginLeft = "0";
         }
         else if (command === 'ls -l' || command === 'ls') {
-          if (currentDir === '~') bootDiv.innerHTML += `drwxr-xr-x 2 Alexandre 4.0K <span class="link" onclick="navigateTo('about')">about</span>\ndrwxr-xr-x 2 Alexandre 4.0K <span class="link" onclick="navigateTo('blog')">blog</span>\n`;
-          else if (currentDir === 'about') bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre 1.2K <span class="link" onclick="catFile('about/presentation.txt')">presentation.txt</span>\n-rw-r--r-- 1 Alexandre 1.2K <span class="link" onclick="catFile('about/cv.pdf')">cv.pdf</span>\n`;
-          else if (currentDir === 'blog' && window.blogArticles) window.blogArticles.forEach(a => bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre 1.2K <span class="link" onclick="catFile('blog/${a.slug}.json')">${a.title}</span>\n`);
+          if (currentDir === '~') {
+            bootDiv.innerHTML += `drwxr-xr-x 2 Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('about')">about</span>\ndrwxr-xr-x 2 Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="navigateTo('blog')">blog</span>\n`;
+          } else if (currentDir === 'about') {
+            bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/presentation.txt')">presentation.txt</span>\n-rw-r--r-- 1 Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('about/cv.pdf')">cv.pdf</span>\n`;
+          } else if (currentDir === 'blog' && window.blogArticles) {
+            window.blogArticles.forEach(a => bootDiv.innerHTML += `-rw-r--r-- 1 Alexandre 1.2K Apr  3 20:00 <span class="link" onclick="catFile('blog/${a.slug}.json')">${a.title}</span>\n`);
+          }
         }
-
         else if (command.startsWith('cd')) {
           const t = command.split(' ')[1];
           if (t === '..') { currentDir = '~'; updatePrompt(); menuDiv.style.display = 'block'; }
           else if (['about', 'blog'].includes(t)) { currentDir = t; updatePrompt(); navigateTo(t); }
           else bootDiv.innerHTML += `cd: ${t}: No such directory\n`;
         }
-
         else if (command.startsWith('cat')) {
-          const f = command.split(' ').slice(1).join(' ');
+          // On prend tout ce qui vient après "cat " pour gérer les titres complets
+          const f = command.substring(4).trim();
           catFile(f);
         }
-
         else if (command === 'last') {
           fetch('./blog/blog.json').then(r => r.json()).then(d => {
             if (d && d.length > 0) {
               d.sort((a,b) => new Date(b.date) - new Date(a.date));
-              catFile('blog/' + d[0].slug + '.json');
+              catFile(d[0].slug);
             } else {
               bootDiv.innerHTML += "No articles found.\n";
             }
           });
         }
-
         else if (command === 'share') {
           const currentUrl = window.location.href;
           if (currentUrl.includes('?article=')) {
@@ -507,21 +499,21 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
             bootDiv.innerHTML += `Nothing to share. Open an article first with 'cat' or 'last'.\n`;
           }
         }
-
         else if (command.startsWith('cowsay')) {
           const message = command.substring(7).trim();
           if (message) bootDiv.innerHTML += cowsay(message) + '\n';
           else bootDiv.innerHTML += "Usage: cowsay [message]\n";
         }
-
         else if (command === 'ip a') {
           bootDiv.innerHTML += "Fetching your public IP address...\n";
-          fetch('https://api.ipify.org?format=json')
-            .then(res => res.json())
-            .then(data => { bootDiv.innerHTML += `Your public IP address is: ${data.ip}\n`; })
+          fetch('https://ifconfig.me/ip')
+            .then(res => {
+              if (!res.ok) throw new Error("Network response was not OK");
+              return res.text(); // On récupère du texte brut, impossible d'avoir une erreur de parse JSON
+            })
+            .then(ip => { bootDiv.innerHTML += `Your public IP address is: ${ip.trim()}\n`; })
             .catch(err => { bootDiv.innerHTML += `Error fetching IP address: ${err.message}\n`; });
         }
-
         else if (command === 'fortune') {
           const fortunes = [
             "You will have a great day today!",
@@ -533,28 +525,23 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
           const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
           bootDiv.innerHTML += `Fortune: ${randomFortune}\n`;
         }
-
         else if (command.startsWith('weather')) {
           const city = command.substring(8).trim();
           if (city) getWeather(city);
           else bootDiv.innerHTML += "Usage: weather [city]\n";
         }
-
         else if (command === 'clearcache') {
           localStorage.clear();
           sessionStorage.clear();
           window.blogArticles = null;
           bootDiv.innerHTML += 'Cache cleared successfully.\n';
         }
-
         else if (command === 'exit') {
           window.location.href = 'https://www.google.com';
         }
-
         else {
           bootDiv.innerHTML += `Command not found: ${command}\n`;
         }
-
         window.scrollTo(0, document.body.scrollHeight);
       }
     });
@@ -590,29 +577,45 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
         });
     }
 
+    // --- Résolveur Intelligent catFile ---
     function catFile(f) {
       if (f.includes('presentation.txt')) {
-        bootDiv.innerHTML += "Deliverability Manager @ Positive Group. Expert in SMTP and DNS.\n";
+        bootDiv.innerHTML += "Deliverability Manager @ Positive Group. Expert in SMTP, DNS (SPF/DKIM/DMARC) and email infrastructure.\n";
       } else if (f.includes('cv.pdf')) {
         window.open('https://www.linkedin.com/in/alexandre-baverel-schmit/', '_blank');
       } else {
-        const slug = f.replace('blog/', '').replace('.json', '');
-        fetch(`./blog/${slug}.json`).then(r => r.json()).then(data => {
+        // Nettoyage de l'entrée (titre, slug, avec ou sans .json)
+        let identifier = f.replace('blog/', '').replace('.json', '').trim();
+        let slug = identifier;
+
+        // Traduction du titre vers le slug si nécessaire
+        if (window.blogArticles) {
+          const article = window.blogArticles.find(a =>
+            a.title.toLowerCase() === identifier.toLowerCase() ||
+            a.slug.toLowerCase() === identifier.toLowerCase()
+          );
+          if (article) slug = article.slug;
+        }
+
+        fetch(`./blog/${slug}.json`).then(r => {
+          if (!r.ok) throw new Error();
+          return r.json();
+        }).then(data => {
           const scrollTarget = document.documentElement.scrollHeight;
-          if (data.banner) bootDiv.innerHTML += `<img src="${data.banner}" style="width:100%;max-width:800px;margin:10px 0;"><br>`;
+          if (data.banner) bootDiv.innerHTML += `<img src="${data.banner}" alt="Banner" style="width: 100%; max-width: 800px; margin: 10px 0;">\n`;
           bootDiv.innerHTML += `\n# ${data.title}\n`;
           data.content.forEach(part => { if (part.type === 'markdown') bootDiv.innerHTML += markdownToHTML(part.text); });
           window.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+
+          // Mise à jour de l'URL proprement
           const newUrl = window.location.pathname + '?article=' + slug;
           window.history.pushState({}, '', newUrl);
         }).catch(() => bootDiv.innerHTML += `cat: ${f}: No such file\n`);
       }
     }
 
-    function loadBlogMenu() { fetch('./blog/blog.json?v='+Date.now()).then(res => res.json()).then(data => window.blogArticles = data); }
-
     function markdownToHTML(markdown) {
-      markdown = markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" />');
+      markdown = markdown.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;height:auto;" />');
       markdown = markdown.replace(/```[\s\S]*?```/g, (m) => `<pre><code>${m.replace(/```/g, '').trim()}</code></pre>`);
       markdown = markdown.replace(/`([^`]+)`/g, '<code>$1</code>');
       markdown = markdown.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
