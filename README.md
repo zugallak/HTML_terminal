@@ -37,7 +37,7 @@
 * Persistance du thème via `localStorage`.
 
 ### V3 - Connectivité & SMTP
-* Ajout du simulateur SMTP Telnet.
+* Ajout du simulateur SMTP Telnet pour envoyer un (vrais) mail à l'adresse de votre choix défini dans `mailer.php`.
 * Première version de la commande `dig`.
 * Intégration de l'API OpenWeather pour la commande `weather`.
 
