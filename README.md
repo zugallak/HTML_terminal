@@ -69,3 +69,6 @@
 
 ## 📜 Licence
 Ce travail est sous licence [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+
+This means you can share this work with proper attribution,
+but cannot use it commercially or create derivative works.
