@@ -1,60 +1,103 @@
-# Terminal Portfolio
+**Terminal Portfolio**
+======================
 
-**Terminal Portfolio** is an interactive website simulating a terminal interface, designed to present a portfolio in a fun way. This project uses only **HTML**, **CSS**, and **JavaScript** to provide an immersive user experience.
+**Terminal Portfolio** est un site web interactif simulant une interface de terminal Linux, conçu pour présenter un portfolio professionnel et une expertise technique de manière immersive.
 
-## Current Features
+**🚀 Fonctionnalités Clés**
+---------------------------
 
-### 1. Boot Animation
-- Arch Linux-style boot animation with simulated log lines.
-- Displays system information similar to neofetch.
-- Lists available commands after boot.
+### **1\. Animation de Boot & Infos Système**
 
-### 2. Terminal Navigation & Commands
-- Interactive terminal with prompt displayed as `guest@Delivlinux in [directory] $`.
-- Supported commands:
-  - `cd [directory]`: Navigate directories.
-  - `ls -l` or `ls`: List files and directories.
-  - `cat [file]`: Display file contents or articles.
-  - `theme [name]`: Change terminal theme (**hacker**, **light**, **ubuntu**, **dracula**).
-  - `clear`: Clear the terminal screen.
-  - `help`: Display available commands.
-  - `whoami`, `neofetch`: Display user and system info.
-  - `curl [URL]`: Open an external link in a new tab.
-  - `cowsay [message]`: Fun ASCII art cow display.
-  - `fortune`, `weather [city]`, `ip a`: Dynamic tools using external APIs.
-  - `last`: Directly load the most recent blog article.
-  - `exit`: Redirect to Google.
+*   Séquence de démarrage style Arch Linux avec simulation de logs système.
+    
+*   Commande neofetch intégrée affichant des informations système personnalisées (Shell, Terminal, Uptime).
+    
+*   Affichage automatique de la liste des commandes après l'initialisation.
+    
 
-### 3. Advanced Interactions
-- **Autocompletion**: Use the **Tab** key for command and file/directory name suggestions.
-- **Command History**: Use **Up** and **Down** arrow keys to navigate through previously entered commands.
-- **Theme Persistence**: User's theme preference is saved in `localStorage` and persists after page reloads.
-- **Dynamic Display**: Real-time simulation of command outputs and clickable links.
+### **2\. Navigation & Commandes de Base**
 
-### 4. Integrated Blog System
-- **Direct Article Linking (Routing)**: Support for URL parameters (e.g., `?article=slug`) to load a specific article automatically.
-- **Dynamic URL Sync**: The browser's URL bar updates automatically when an article is opened via `cat` for easy sharing.
-- Articles dynamically loaded from local **JSON** files.
-- Custom **Markdown** rendering engine supporting images, links, code blocks, and more.
-- SEO optimization via dynamic injection of Schema.org metadata.
+*   Shell interactif complet avec prompt dynamique : guest@Delivlinux in \[directory\] $.
+    
+*   **Navigation** : cd, ls, ls -l, cd ...
+    
+*   **Contenu** : cat \[file\] (lecture de fichiers texte et articles de blog).
+    
+*   **Système** : clear, help, whoami, exit (redirection vers Google).
+    
+*   **Outils** : curl \[URL\] (ouverture de liens), cowsay, fortune.
+    
+*   **Dynamique** : weather \[city\], ip a (appels API en temps réel).
+    
 
-## Upcoming Features (V3)
+### **3\. 📧 Simulation SMTP & MTA (MTA Simulator)**
 
-### 1. Search Engine (Grep)
-- A `search [keyword]` command to find specific terms across all blog articles.
+Une simulation haute fidélité d'une interaction avec un serveur ESMTP via Telnet, spécialement conçue pour les professionnels de la délivrabilité e-mail.
 
-### 2. Share Command
-- A dedicated command to quickly copy the current article's direct link to the clipboard.
+*   **Commande** : telnet port25.sh 25.
+    
+*   **Support du Protocole** : Implémente EHLO, MAIL FROM, RCPT TO, DATA, et QUIT.
+    
+*   **Sécurité & Validation** :
+    
+*   **Validation de Syntaxe** : Validation stricte par Regex pour les adresses MAIL FROM:.
+    
+*   **Restriction du Destinataire** : Accepte uniquement les messages pour alex@port25.sh (erreur 550 User unknown pour les autres).
+    
+*   **Sécurité HTML** : Échappement automatique des caractères < > pour un affichage sécurisé dans le terminal.
+    
+*   **Envoi Réel** : Intégration avec l'**API Tipimail** via un backend PHP sécurisé pour envoyer de vrais e-mails depuis la simulation.
+    
+*   **UX** : Bannière "Hint" intégrée (MOTD) fournissant un tutoriel du protocole lors de la connexion.
+    
 
-## Installation
+### **4\. ✍️ Système de Blog Intégré**
 
-1. Clone this repository.
-2. Open `index.html` in your browser.
+*   **Recherche Avancée** : Commande grep \[keyword\] qui parcourt de manière asynchrone tous les articles de blog basés sur JSON.
+    
+*   **Rendu Markdown** : Moteur personnalisé supportant les titres, gras/italique, listes, liens, blocs de code et images.
+    
+*   **SEO & Social** :
+    
+*   Injection dynamique de métadonnées **Schema.org** JSON-LD pour chaque article.
+    
+*   Commande share pour copier un permalien direct dans le presse-papier.
+    
 
-## Usage
+### **5\. Interactions Avancées**
 
-Simply enter commands in the terminal interface to navigate and explore the portfolio content. Use the `help` command to see all available commands.
+*   **Autocomplétion** : Support de la touche **Tab** pour les commandes, dossiers et noms de fichiers.
+    
+*   **Historique de Commandes** : Navigation dans les entrées précédentes avec les flèches **Haut/Bas**.
+    
+*   **Moteur de Thèmes** : Switch entre dracula (défaut), hacker, light, et ubuntu. Le choix est persisté dans le localStorage.
+    
+*   **Routage** : Support des paramètres URL (?article=slug) pour lier directement un contenu spécifique.
+    
 
-## License
+**🛠️ Stack Technique**
+-----------------------
 
-This work is licensed under the [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
+*   **Frontend** : HTML5 Vanilla, CSS3 (Variables modernes/Root), JavaScript (ES6+).
+    
+*   **Backend** : PHP (Intégration CURL/API Tipimail).
+    
+*   **Stockage** : JSON pour le contenu du blog, LocalStorage pour la persistance du thème.
+    
+
+**📦 Installation**
+-------------------
+
+1.  Cloner ce dépôt.
+    
+2.  S'assurer d'avoir un environnement PHP pour utiliser la fonctionnalité d'envoi de mails.
+    
+3.  Configurer vos clés API Tipimail dans mailer.php.
+    
+4.  Ouvrir index.html dans votre navigateur.
+    
+
+**📜 Licence**
+--------------
+
+Ce travail est sous licence [Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License](https://creativecommons.org/licenses/by-nc-nd/4.0/).
