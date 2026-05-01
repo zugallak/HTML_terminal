@@ -505,14 +505,24 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
           else bootDiv.innerHTML += "Usage: cowsay [message]\n";
         }
         else if (command === 'ip a') {
-          bootDiv.innerHTML += "Fetching your public IP address...\n";
-          fetch('https://ifconfig.me/ip')
-            .then(res => {
-              if (!res.ok) throw new Error("Network response was not OK");
-              return res.text(); // On récupère du texte brut, impossible d'avoir une erreur de parse JSON
-            })
-            .then(ip => { bootDiv.innerHTML += `Your public IP address is: ${ip.trim()}\n`; })
-            .catch(err => { bootDiv.innerHTML += `Error fetching IP address: ${err.message}\n`; });
+          bootDiv.innerHTML += "Fetching network interfaces...\n";
+
+          // Requêtes simultanées vers des endpoints stricts IPv4 et IPv6
+          const p4 = fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => null);
+          const p6 = fetch('https://api6.ipify.org?format=json').then(r => r.json()).then(d => d.ip).catch(() => null);
+
+          Promise.all([p4, p6]).then(([ipv4, ipv6]) => {
+            bootDiv.innerHTML += `1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN\n`;
+            bootDiv.innerHTML += `    inet 127.0.0.1/8 scope host lo\n`;
+            bootDiv.innerHTML += `    inet6 ::1/128 scope host\n`;
+            bootDiv.innerHTML += `2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP\n`;
+
+            if (ipv4) bootDiv.innerHTML += `    inet ${ipv4}/24 brd 255.255.255.255 scope global eth0\n`;
+            if (ipv6) bootDiv.innerHTML += `    inet6 ${ipv6}/64 scope global dynamic\n`;
+            if (!ipv4 && !ipv6) bootDiv.innerHTML += `    [Network disconnected]\n`;
+
+            window.scrollTo(0, document.body.scrollHeight);
+          });
         }
         else if (command === 'fortune') {
           const fortunes = [
