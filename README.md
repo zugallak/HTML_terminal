@@ -17,7 +17,7 @@
 * **`curl [URL]`** : Outil pour ouvrir des liens externes proprement.
 
 ### 3. 📧 Simulation SMTP & MTA (MTA Simulator)
-* **`telnet port25.sh 25`** : Simulation haute fidélité d'une session ESMTP.
+* **`telnet port25.sh 25`** : Simulation haute fidélité d'une session ESMTP pour envoyer un mail à l'adresse de votre choix dans mailer.php.
 * **Support Protocole** : Implémente `EHLO`, `MAIL FROM`, `RCPT TO`, `DATA`, et `QUIT`.
 * **Backend PHP** : Envoi réel d'e-mails via l'API Tipimail avec validation syntaxique stricte.
 
