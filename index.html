@@ -358,7 +358,7 @@ drwxr-xr-x 2 Alexandre Alexandre 4.0K Apr  3 20:00 <span class="link" onclick="n
               } else bootDiv.innerHTML += "503 5.5.1 Error: need RCPT command\n";
               break;
             case 3:
-              if (command.toUpperCase() === 'DATA') { bootDiv.innerHTML += "354 End data with <CR><LF>.<CR><LF>\n"; smtpStep = 4; }
+              if (command.toUpperCase() === 'DATA') { bootDiv.innerHTML += "354 End data with &lt;CR&gt;&lt;LF&gt;.&lt;CR&gt;&lt;LF&gt;\n"; smtpStep = 4; }
               else bootDiv.innerHTML += "503 5.5.1 Error: need DATA command\n";
               break;
             case 4:
